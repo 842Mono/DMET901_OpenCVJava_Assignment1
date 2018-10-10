@@ -56,28 +56,25 @@ public class trial {
       
       //create final mat with figure 1 size as it is larger
       
-      Mat finalMat = new Mat(figure1.rows(),figure1.cols(),figure1.type());
-//		figure1.copyTo(finalMat);
-//      for(int row=0;row<figure1.rows();row++){
-//      	for(int col=0;col<300;col++){
-//      		double[]fig1val= figure1.get(row, col);
-//      		double[]fig3val= figure3.get(row, col);
-//      		finalMat.put(row, col, new double[]{(fig3val[0]*0.15)+(fig1val[0]*0.85),(fig3val[1]*0.15)+(fig1val[1]*0.85),(fig3val[2]*0.15)+(fig1val[2]*0.85)});
-//      	}
-//      }
-      // blending 0.5 of each figure
+      Mat finalMat = new Mat(destination.rows(),destination.cols(),destination.type());
+		destination.copyTo(finalMat);
+		
       for(int row=0;row<destination.rows();row++){
-      	for(int col=0;col<destination.cols();col++){
+      	for(int col=0;col<300;col++){
       		double[]fig1val= destination.get(row, col);
       		double[]fig3val= figure3.get(row, col);
-      		if(col>300){
-      			fig3val= figure3.get(row, col-300);
+      		finalMat.put(row, col, new double[]{(fig3val[0]*0.15)+(fig1val[0]*0.85),(fig3val[1]*0.15)+(fig1val[1]*0.85),(fig3val[2]*0.15)+(fig1val[2]*0.85)});
+      	}
+      }
+      // blending 0.5 of each figure
+      for(int row=0;row<destination.rows();row++){
+      	for(int col=300;col<destination.cols();col++){
+      		double[]fig1val= destination.get(row, col);
+      		double[]fig3val= figure3.get(row, col-300);
+   
       		finalMat.put(row, col, new double[]{(fig3val[0]*0.15)+(fig1val[0]*0.85),(fig3val[1]*0.15)+(fig1val[1]*0.85)
-      				,(fig3val[2]*0.15)+(fig1val[2]*0.85)});}
-      		else{
-      			finalMat.put(row, col, new double[]{(fig3val[0])+(fig1val[0]),(fig3val[1])+(fig1val[1])
-          				,(fig3val[2])+(fig1val[2])});
-      		}
+      				,(fig3val[2]*0.15)+(fig1val[2]*0.85)});
+
       	}
       }
       //write final image
