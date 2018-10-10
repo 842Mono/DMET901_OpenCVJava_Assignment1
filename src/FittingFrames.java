@@ -22,50 +22,32 @@ public class FittingFrames
 		// resize sherlock
 		Imgproc.resize(Q2I1, Q2I1, new Size(90, 140));
 		
-		//trying to overlay
+		// overlay sherlock over first background
 		Mat out = new Mat();
-		overlayImage(Q2I2, Q2I1, out, new Point(0,0));
+		overlayImage(Q2I2, Q2I1, out, new Point(1218, 377));
 		
 		Imgcodecs.imwrite(pathToWriteLocation + "output.png", out);
 	}
 	
 	public static void overlayImage(Mat background, Mat foreground, Mat output, Point location)
 	{
-		background.copyTo(output);
-		
-//		Imgcodecs.imwrite(pathToWriteLocation + "testCopy.png", output);
-//		System.out.println(background.rows());
+		background.copyTo(output); // copy the background to the output
 		
 		for(int y = (int) Math.max(location.y , 0); y < background.rows(); ++y) //looping over the rows of the background
 		{
-			int fY = (int) (y - location.y);
+			int fY = (int) (y - location.y); // I dunno what this is XD
 	
-			if(fY >= foreground.rows())
+			if(fY >= foreground.rows()) // break if we're done with overlaying the foreground
 				break;
 	
-			for(int x = (int) Math.max(location.x, 0); x < background.cols(); ++x) //looping over the columns of the background
+			for(int x = (int) Math.max(location.x, 0); x < background.cols(); ++x) // looping over the columns of the background
 			{
 				int fX = (int) (x - location.x);
-				if(fX >= foreground.cols())
+				
+				if(fX >= foreground.cols()) // break if we're done with overlaying the foreground
 					break;
 				
-				double[] finalPixelValue = new double[3];
-	
-				finalPixelValue[0] = background.get(y, x)[0];
-				finalPixelValue[1] = background.get(y, x)[1];
-				finalPixelValue[2] = background.get(y, x)[2];
-	
-				for(int c = 0;  c < output.channels(); ++c)
-				{
-					double foregroundPx =  foreground.get(fY, fX)[c];
-//					double backgroundPx =  background.get(y, x)[c];
-
-//					float fOpacity = (float) (opacity / 255);
-					finalPixelValue[c] = foregroundPx;
-					if(c==3)
-						finalPixelValue[c] = foreground.get(fY,fX)[3];
-				}
-				output.put(y, x, finalPixelValue);
+				output.put(y, x, new double[] {foreground.get(fY, fX)[0], foreground.get(fY, fX)[1], foreground.get(fY, fX)[2]});
 			}
 		}
 	}
