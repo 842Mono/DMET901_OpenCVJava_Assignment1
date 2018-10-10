@@ -8,7 +8,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
 
-public class FittingFrames
+public class Assignment1
 {
 	final static String pathToImages = "C:\\Users\\mina_\\Desktop\\eclipse-workspace\\TestOpencv\\A1I\\";
 	final static String pathToWriteLocation = "C:\\Users\\mina_\\Desktop\\CV project\\";
@@ -17,6 +17,10 @@ public class FittingFrames
 	{
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
+        Mat figure1 = Imgcodecs.imread(pathToImages + "Q1I1.png");
+        Mat figure3 = Imgcodecs.imread(pathToImages + "Q1I2.jpg");
+        Mat blended = blend(figure1,figure3); // output
+
 		Mat Q2I1 = Imgcodecs.imread(pathToImages + "Q2I1.jpg");
 		Mat Q2I2 = Imgcodecs.imread(pathToImages + "Q2I2.jpg"); // output
 		Mat Q2I3 = Imgcodecs.imread(pathToImages + "Q2I3.jpg"); // output
@@ -55,8 +59,71 @@ public class FittingFrames
 		Imgproc.warpPerspective(Q2I1, homographyTransformation, transform, new Size(612, 406));
 		overlayImageWithAlpha(Q3, homographyTransformation, Q3, new Point(0,0));
 		
-		Imgcodecs.imwrite(pathToWriteLocation + "output.png", Q3);
+		Imgcodecs.imwrite(pathToWriteLocation + "Output Question 1.png", blended);
+		Imgcodecs.imwrite(pathToWriteLocation + "Output Question 2 Fig 8.png", Q2I2);
+		Imgcodecs.imwrite(pathToWriteLocation + "Output Question 2 Fig 9.png", Q2I3);
+		Imgcodecs.imwrite(pathToWriteLocation + "Output Question 3.png", Q3);
 	}
+	
+	public static Mat blend(Mat figure1, Mat figure3){
+        Imgcodecs imageCodecs = new Imgcodecs();
+      // flip figure 3 amd resize
+      Core.flip(figure3,figure3,1);
+      Imgproc.resize(figure3, figure3, new Size(1121,788 ));
+      //write the flipped image 
+      imageCodecs.imwrite("flipped.png",figure3);
+      
+      //brightness and contrast
+      double alpha = 8;
+//      double beta = 100;
+      Mat destination = new Mat(figure1.rows(),figure1.cols(),figure1.type());
+//      figure1.convertTo(destination, -1, alpha, beta);
+      for(int col=0;col<figure1.cols();col++){
+      for(int row=0;row<figure1.rows();row++){
+      		double[]fig1val= figure1.get(row, col);
+      		if(row==figure1.rows()/2)
+      		{   
+//	        		if(alpha>1) 
+	        			alpha-=0.0075;
+//	        		if(beta>50)beta;
+	        		System.out.println(alpha);
+//	        		System.out.println(beta);
+	        	}
+      		destination.put(row, col, new double[]{(fig1val[0]*alpha),(fig1val[1]*alpha),
+      				(fig1val[2]*alpha)});
+      	
+      	}
+      	}
+    imageCodecs.imwrite("bright.png",destination);
+      
+      
+      //create final mat with figure 1 size as it is larger
+      
+      Mat finalMat = new Mat(destination.rows(),destination.cols(),destination.type());
+		destination.copyTo(finalMat);
+		
+      for(int row=0;row<destination.rows();row++){
+      	for(int col=0;col<300;col++){
+      		double[]fig1val= destination.get(row, col);
+      		double[]fig3val= figure3.get(row, col);
+      		finalMat.put(row, col, new double[]{(fig3val[0]*0.15)+(fig1val[0]*0.85),(fig3val[1]*0.15)+(fig1val[1]*0.85),(fig3val[2]*0.15)+(fig1val[2]*0.85)});
+      	}
+      }
+      // blending 0.5 of each figure
+      for(int row=0;row<destination.rows();row++){
+      	for(int col=300;col<destination.cols();col++){
+      		double[]fig1val= destination.get(row, col);
+      		double[]fig3val= figure3.get(row, col-300);
+   
+      		finalMat.put(row, col, new double[]{(fig3val[0]*0.15)+(fig1val[0]*0.85),(fig3val[1]*0.15)+(fig1val[1]*0.85)
+      				,(fig3val[2]*0.15)+(fig1val[2]*0.85)});
+
+      	}
+      }
+      // write final image
+      //imageCodecs.imwrite("blend.png",finalMat);
+      return finalMat;
+    }
 	
 	public static void overlayImageWithAlpha(Mat background,Mat foreground,Mat output, Point location)
 	{
