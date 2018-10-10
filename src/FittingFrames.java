@@ -1,9 +1,12 @@
+import java.util.ArrayList;
+
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.utils.Converters;
 
 public class FittingFrames
 {
@@ -17,6 +20,7 @@ public class FittingFrames
 		Mat Q2I1 = Imgcodecs.imread(pathToImages + "Q2I1.jpg");
 		Mat Q2I2 = Imgcodecs.imread(pathToImages + "Q2I2.jpg"); // output
 		Mat Q2I3 = Imgcodecs.imread(pathToImages + "Q2I3.jpg"); // output
+		Mat Q3 = Imgcodecs.imread(pathToImages + "Q3I1.jpg"); // output
 		
 		// resize and overlay sherlock over first background
 		Mat resizeForOut1 = new Mat();
@@ -32,7 +36,26 @@ public class FittingFrames
 		Imgproc.warpAffine(resizeRotateForOut2, resizeRotateForOut2, rotationMatrix, Q2I1.size()); // rotate and scale
 		overlayImageWithAlpha(Q2I3, resizeRotateForOut2, Q2I3, new Point(265,-5)); // overlay. // note, bottom left pixel: 325, 525
 		
-		Imgcodecs.imwrite(pathToWriteLocation + "output.png", Q2I3);
+		Imgproc.cvtColor(Q2I1, Q2I1, Imgproc.COLOR_RGB2RGBA); //add alpha
+		Imgproc.cvtColor(Q3, Q3, Imgproc.COLOR_RGB2RGBA); //add alpha
+		ArrayList<Point> initialTransform = new ArrayList<Point>(), finalTransform = new ArrayList<Point>();
+		initialTransform.add(new Point(0, 0));
+		initialTransform.add(new Point(Q2I1.cols(), 0));
+		initialTransform.add(new Point(Q2I1.cols(), Q2I1.rows()));
+		initialTransform.add(new Point(0, Q2I1.rows()));
+		finalTransform.add(new Point(163, 35));
+		finalTransform.add(new Point(469, 69));
+		finalTransform.add(new Point(464, 353));
+		finalTransform.add(new Point(157, 391));
+		
+		Mat transform = Imgproc.getPerspectiveTransform(Converters.vector_Point2f_to_Mat(initialTransform), Converters.vector_Point2f_to_Mat(finalTransform));
+		Mat homographyTransformation = new Mat();
+		
+		
+		Imgproc.warpPerspective(Q2I1, homographyTransformation, transform, new Size(612, 406));
+		overlayImageWithAlpha(Q3, homographyTransformation, Q3, new Point(0,0));
+		
+		Imgcodecs.imwrite(pathToWriteLocation + "output.png", Q3);
 	}
 	
 	public static void overlayImageWithAlpha(Mat background,Mat foreground,Mat output, Point location)
