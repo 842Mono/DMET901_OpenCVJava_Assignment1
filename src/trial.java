@@ -26,39 +26,45 @@ public class trial {
        
         //read figure1
         Mat figure1 = imageCodecs.imread("A1I/Q1I1.png");
-        //brightness and contrast
-        double alpha = 2;
-        double beta = 100;
-        Mat destination = new Mat(figure1.rows(),figure1.cols(),figure1.type());
-//        figure1.convertTo(destination, -1, alpha, beta);
-        for(int row=0;row<figure1.rows();row++){
-        	for(int col=0;col<figure1.cols();col++){
-        		double[]fig1val= figure1.get(row, col);
-        		if(row==figure1.rows()/2)
-        		{   
-	        		if(alpha>0) alpha--;
-	        		if(beta>50)beta--;
-	        		System.out.println(alpha);
-	        		System.out.println(beta);
-	        	}
-        		destination.put(row, col, new double[]{(fig1val[0]*alpha)+beta,(fig1val[1]*alpha)+beta,
-        				(fig1val[2]*alpha)+beta});
-        	
-        	}
-        	}
-      imageCodecs.imwrite("bright.png",destination);
+//        //brightness and contrast
+//        double alpha = 2;
+//        double beta = 100;
+//        Mat destination = new Mat(figure1.rows(),figure1.cols(),figure1.type());
+////        figure1.convertTo(destination, -1, alpha, beta);
+//        for(int row=0;row<figure1.rows();row++){
+//        	for(int col=0;col<figure1.cols();col++){
+//        		double[]fig1val= figure1.get(row, col);
+//        		if(row==figure1.rows()/2)
+//        		{   
+//	        		if(alpha>0) alpha--;
+//	        		if(beta>50)beta--;
+//	        		System.out.println(alpha);
+//	        		System.out.println(beta);
+//	        	}
+//        		destination.put(row, col, new double[]{(fig1val[0]*alpha)+beta,(fig1val[1]*alpha)+beta,
+//        				(fig1val[2]*alpha)+beta});
+//        	
+//        	}
+//        	}
+//      imageCodecs.imwrite("bright.png",destination);
 
         //create final mat with figure 1 size as it is larger
       
-      
         Mat finalMat = new Mat(figure1.rows(),figure1.cols(),figure1.type());
-
-        // blending 0.5 of each figure
-        for(int row=0;row<figure3.rows();row++){
-        	for(int col=0;col<figure3.cols();col++){
+		figure1.copyTo(finalMat);
+        for(int row=0;row<figure1.rows();row++){
+        	for(int col=0;col<300;col++){
         		double[]fig1val= figure1.get(row, col);
         		double[]fig3val= figure3.get(row, col);
-        		finalMat.put(row, col, new double[]{(fig3val[0]*0.5)+(fig1val[0]*0.5),(fig3val[1]*0.5)+(fig1val[1]*0.5),(fig3val[2]*0.5)+(fig1val[2]*0.5)});
+        		finalMat.put(row, col, new double[]{(fig3val[0]*0.15)+(fig1val[0]*0.85),(fig3val[1]*0.15)+(fig1val[1]*0.85),(fig3val[2]*0.15)+(fig1val[2]*0.85)});
+        	}
+        }
+        // blending 0.5 of each figure
+        for(int row=0;row<figure1.rows();row++){
+        	for(int col=300;col<figure1.cols();col++){
+        		double[]fig1val= figure1.get(row, col);
+        		double[]fig3val= figure3.get(row, col-300);
+        		finalMat.put(row, col, new double[]{(fig3val[0]*0.15)+(fig1val[0]*0.85),(fig3val[1]*0.15)+(fig1val[1]*0.85),(fig3val[2]*0.15)+(fig1val[2]*0.85)});
         	}
         }
         //write final image
