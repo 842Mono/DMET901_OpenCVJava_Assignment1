@@ -17,25 +17,29 @@ public class FittingFrames
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
 		Mat Q2I1 = Imgcodecs.imread(pathToImages + "Q2I1.jpg");
-		Mat Q2I2 = Imgcodecs.imread(pathToImages + "Q2I2.jpg");
+		Mat Q2I2 = Imgcodecs.imread(pathToImages + "Q2I2.jpg"); // output
+		Mat Q2I3 = Imgcodecs.imread(pathToImages + "Q2I3.jpg");
 		
-		// resize sherlock
-		Imgproc.resize(Q2I1, Q2I1, new Size(90, 140));
+		// resize and overlay sherlock over first background
+		Mat resizeForOut1 = new Mat();
+		Imgproc.resize(Q2I1, resizeForOut1, new Size(90, 140));
+		overlayImage(Q2I2, resizeForOut1, Q2I2, new Point(1218, 377));
 		
-		// overlay sherlock over first background
-		Mat out = new Mat();
-		overlayImage(Q2I2, Q2I1, out, new Point(1218, 377));
+		// resize, rotate and overlay sherlock over second background
+		Mat rotationMatrix = Imgproc.getRotationMatrix2D(new Point(Q2I1.rows()/2, Q2I1.cols()/2), -5, 1.0);
+		Mat resizeRotateForOut2 = new Mat();
+		Imgproc.warpAffine(Q2I1, resizeRotateForOut2, rotationMatrix, Q2I1.size());
 		
-		Imgcodecs.imwrite(pathToWriteLocation + "output.png", out);
+		Imgcodecs.imwrite(pathToWriteLocation + "output.png", Q2I3);
 	}
 	
 	public static void overlayImage(Mat background, Mat foreground, Mat output, Point location)
 	{
-		background.copyTo(output); // copy the background to the output
+		background.copyTo(output); // copy the background to the output (if it's a different matrix)
 		
 		for(int y = (int) Math.max(location.y , 0); y < background.rows(); ++y) //looping over the rows of the background
 		{
-			int fY = (int) (y - location.y); // I dunno what this is XD
+			int fY = (int) (y - location.y);
 	
 			if(fY >= foreground.rows()) // break if we're done with overlaying the foreground
 				break;
