@@ -17,9 +17,9 @@ public class Assignment1
 	{
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
-        Mat figure1 = Imgcodecs.imread(pathToImages + "Q1I1.png");
-        Mat figure3 = Imgcodecs.imread(pathToImages + "Q1I2.jpg");
-        Mat blended = blend(figure1,figure3); // output
+        	Mat figure1 = Imgcodecs.imread(pathToImages + "Q1I1.png");
+        	Mat figure3 = Imgcodecs.imread(pathToImages + "Q1I2.jpg");
+        	Mat blended = blend(figure1,figure3); // output
 
 		Mat Q2I1 = Imgcodecs.imread(pathToImages + "Q2I1.jpg");
 		Mat Q2I2 = Imgcodecs.imread(pathToImages + "Q2I2.jpg"); // output
@@ -148,24 +148,24 @@ public class Assignment1
 				opacity = foreground.get(fY , fX)[3];
 	
 				finalPixelValue[0] = background.get(y, x)[0];
-	           	finalPixelValue[1] = background.get(y, x)[1];
-	           	finalPixelValue[2] = background.get(y, x)[2];
-	           	finalPixelValue[3] = background.get(y, x)[3];
-	
-	           	for(int c = 0;  c < output.channels(); ++c)
-	           	{
-	           		if(opacity > 0)
-	           		{
-	           			double foregroundPx =  foreground.get(fY, fX)[c];
-	           			double backgroundPx =  background.get(y, x)[c];
-		
-	           			float fOpacity = (float) (opacity / 255);
-	           			finalPixelValue[c] = ((backgroundPx * ( 1.0 - fOpacity)) + (foregroundPx * fOpacity));
-	           			if(c==3)
-	           				finalPixelValue[c] = foreground.get(fY,fX)[3];
-	           		}
-	           	}
-	           	output.put(y, x,finalPixelValue);
+				finalPixelValue[1] = background.get(y, x)[1];
+				finalPixelValue[2] = background.get(y, x)[2];
+				finalPixelValue[3] = background.get(y, x)[3];
+
+				for(int c = 0;  c < output.channels(); ++c)
+				{
+					if(opacity > 0)
+					{
+						double foregroundPx =  foreground.get(fY, fX)[c];
+						double backgroundPx =  background.get(y, x)[c];
+
+						float fOpacity = (float) (opacity / 255);
+						finalPixelValue[c] = ((backgroundPx * ( 1.0 - fOpacity)) + (foregroundPx * fOpacity));
+						if(c==3)
+							finalPixelValue[c] = foreground.get(fY,fX)[3];
+					}
+				}
+				output.put(y, x,finalPixelValue);
 			}
 		}
 	}
